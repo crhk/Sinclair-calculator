@@ -1,5 +1,5 @@
 import { Player, Team } from "../data/data";
-import { coefficients } from "../data/coefficients";
+import { calculateSinclair } from "./sinclair";
 
 export const calculateCJ = (IWFToBeat: number, team: Team, player: Player, projectedCJ: number): number => {
     const teamTotal = team.team.total
@@ -10,8 +10,8 @@ export const calculateCJ = (IWFToBeat: number, team: Team, player: Player, proje
 
     const actualTotal = maxSnatch + maxCJ
     const projectedTotal = maxSnatch + projectedCJ
-    const actualSinclair = Math.floor(actualTotal*coefficients[bw]*100) / 100
-    const projectedSinclair = Math.floor(projectedTotal*coefficients[bw]*100) / 100
+    const actualSinclair = calculateSinclair(actualTotal, bw)
+    const projectedSinclair = calculateSinclair(projectedTotal, bw)
 
     const teamTotalWithoutPlayer = teamTotal - actualSinclair
     const projectedTeamTotal = teamTotalWithoutPlayer + projectedSinclair

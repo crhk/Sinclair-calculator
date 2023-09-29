@@ -11,7 +11,7 @@ export const useTeams = () => {
         data.forEach(({ team, players }) => {
             setActualBestIWFTeam(prev => team.total > prev ? team.total : prev )
 
-            const projectedTeamTotal = Math.round(players.reduce((current, { bw, snatches, cjs }) => {
+            const projectedTeamTotal = Math.floor(players.reduce((current, { bw, snatches, cjs }) => {
                 const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
                 const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
 

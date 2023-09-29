@@ -1,10 +1,11 @@
 "use client";
 
-import { Fragment } from "react";
-import { Status, data } from "./data/data";
+import { Fragment, useEffect, useState } from "react";
 import { coefficients } from "./data/coefficients";
 import { useTeams } from "./hooks/useTeams";
 import { calculateCJ } from "./lib/calculateCJ";
+import { Team } from "./data/data";
+import { calculateSinclair } from "./lib/sinclair";
 
 const getClassName = (status: string) => {
   switch(status) {
@@ -20,6 +21,26 @@ const getClassName = (status: string) => {
 
 export default function Home() {
   const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams()
+  const [data, setData] = useState<Team[] | null>(null)
+
+  useEffect(() => {
+    const test = async () => {
+      const res = await fetch('/searchprod', {
+        method: "POST",
+        body: JSON.stringify({ searchPrompt: 'cats' }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      })
+
+      const data = await res.json()
+      setData(data)
+    }
+
+    test()
+  }, [])
+
+  console.log({data})
 
   return (
     <>
@@ -45,7 +66,7 @@ export default function Home() {
           </tr>
         </thead>
         <tbody>
-          {data.map(elem => {
+          {data && data.length && data.map(elem => {
             const { team, players } = elem
             return <Fragment key={team.name}>
               <tr>
@@ -56,13 +77,13 @@ export default function Home() {
                   {team.total}
                 </td>
                 <td className='text-left'>
-                  {Math.round(players.reduce((current, { bw, snatches, cjs }) => {
+                  {Math.floor(players.reduce((current, { bw, snatches, cjs }) => {
                     const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
                     const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
     
                     const total = maxSnatch + maxCJ
     
-                    const sinclair = Math.floor(total*coefficients[bw]*100) / 100
+                    const sinclair = calculateSinclair(total,bw)
                     return current + sinclair
                   }, 0 )*100) / 100}
                 </td>
@@ -74,7 +95,7 @@ export default function Home() {
 
                 const total = maxSnatch + maxCJ
 
-                const sinclair = Math.floor(total*coefficients[bw]*100) / 100
+                const sinclair = calculateSinclair(total,bw)
 
                 return <tr key={name}>
                   <td>{name}</td>
