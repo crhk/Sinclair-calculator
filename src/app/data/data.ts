@@ -5,25 +5,24 @@ interface Attempt {
     status: Status
 }
 
-interface Player {
+export interface Player {
     name: string
     snatches: Attempt[]
     cjs: Attempt[]
     bw: number
 }
 
-interface Team {
-    teamName: string
+export interface Team {
+    team: { name: string, total: number }
     players: Player[]
 }
 
-interface TableData {
-    data: Team[]
-}
-
-export const data = [
+export const data: Team[] = [
     {
-        teamName: 'RBC',
+        team: {
+            name: 'RBC',
+            total: 1428.98
+        },
         players: [
             {
                 name: 'Allan MOUSSET',
@@ -58,8 +57,10 @@ export const data = [
         ]
     },
     {
-        teamName: 'CJF LAVAL VOUTRE HALTERO 53',
-        players: [
+        team: {
+            name: 'CJF LAVAL VOUTRE HALTERO 53',
+            total: 1443.22
+        },        players: [
             {
                 name: 'ROGUET Thomas',
                 bw: 80.10,
@@ -88,7 +89,7 @@ export const data = [
                 name: 'DUCHEMANE Nelson',
                 bw: 100.10,
                 snatches: [{ weight: 95, status: 'good lift' }, { weight: 100, status: 'good lift' }, { weight: 102, status: 'no lift' }],
-                cjs: [{ weight: 115, status: 'good lift' }, { weight: 122, status: 'good lift' }, { weight: 126, status: 'to do' }],
+                cjs: [{ weight: 115, status: 'good lift' }, { weight: 122, status: 'good lift' }, { weight: 126, status: 'good lift' }],
             },
         ]
     }
