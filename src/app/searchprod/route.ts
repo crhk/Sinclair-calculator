@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-import * as cheerio from 'cheerio'
 
 const formatLifts = (lifts: string[]) => lifts.map((lift: string) => ({
         weight: parseInt(lift),
@@ -9,13 +8,14 @@ const formatLifts = (lifts: string[]) => lifts.map((lift: string) => ({
 
 
 export async function POST(request: Request) {
+    const { url } = await request.json()
     const browser = await puppeteer.launch({ headless: 'new' });
 
     // Create a page
     const page = await browser.newPage();
   
     // Go to your site
-    await page.goto('http://scoresheet.ffhaltero.fr/scoresheet/team/competition/view/4650');
+    await page.goto(`http://scoresheet.ffhaltero.fr/scoresheet/team/competition/view/${url}`);
 
     const resultTable = await page.$('.event-box tbody')
 
@@ -44,7 +44,8 @@ export async function POST(request: Request) {
                             name: player[1],
                             bw: parseFloat(player[5].replace(',', '.')),
                             snatches: formatLifts(player.slice(6, 9)),
-                            cjs: formatLifts(player.slice(10, 13))
+                            cjs: formatLifts(player.slice(10, 13)),
+                            sex: player[16].includes('M') ? 'M' : 'F'
                         }
                         const lastIndex = data.length - 1
                         data[lastIndex].players.push(formatPlayer)

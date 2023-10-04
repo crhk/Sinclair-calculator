@@ -1,10 +1,9 @@
 "use client";
 
 import { Fragment, useEffect, useState } from "react";
-import { coefficients } from "./data/coefficients";
 import { useTeams } from "./hooks/useTeams";
 import { calculateCJ } from "./lib/calculateCJ";
-import { Team } from "./data/data";
+import { Team } from "./data/types";
 import { calculateSinclair } from "./lib/sinclair";
 
 const getClassName = (status: string) => {
@@ -20,27 +19,36 @@ const getClassName = (status: string) => {
 }
 
 export default function Home() {
-  const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams()
+  const [url, setUrl] = useState<string | null>()
   const [data, setData] = useState<Team[] | null>(null)
+  const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams(data)
 
-  useEffect(() => {
-    const test = async () => {
+  const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
+    e.stopPropagation()
+    e.preventDefault()
+
+    if (url) {
       const res = await fetch('/searchprod', {
         method: "POST",
-        body: JSON.stringify({ searchPrompt: 'cats' }),
+        body: JSON.stringify({ url }),
         headers: {
           "Content-Type": "application/json"
         },
       })
-
+  
       const data = await res.json()
+      console.log({data})
       setData(data)
     }
+  }
 
-    test()
-  }, [])
-
-  console.log({data})
+  if (!data) {
+    return <form onSubmit={handleSubmit}>
+      <label htmlFor="url">FFHM Scoresheet URL ou ID</label>
+      <input type="text" id="url" name="url" onChange={(e) => setUrl(e.target.value)}/>
+      <input type="submit" />
+    </form>
+  }
 
   return (
     <>
@@ -70,32 +78,32 @@ export default function Home() {
             const { team, players } = elem
             return <Fragment key={team.name}>
               <tr>
-                <td colSpan={11} className='text-left'>
+                <td colSpan={11} className='text-left font-extrabold'>
                 {team.name}
                 </td>
                 <td colSpan={2} className='text-left'>
                   {team.total}
                 </td>
                 <td className='text-left'>
-                  {Math.floor(players.reduce((current, { bw, snatches, cjs }) => {
+                  {Math.floor(players.reduce((current, { bw, snatches, cjs, sex }) => {
                     const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
                     const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift' || status === 'to do').map(({ weight }) => weight))
     
                     const total = maxSnatch + maxCJ
     
-                    const sinclair = calculateSinclair(total,bw)
+                    const sinclair = calculateSinclair(total, bw, sex)
                     return current + sinclair
                   }, 0 )*100) / 100}
                 </td>
               </tr>
               {players.map(player => {
-                const { name, bw, snatches, cjs } = player
+                const { name, bw, snatches, cjs, sex } = player
                 const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift').map(({ weight }) => weight))
                 const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift').map(({ weight }) => weight))
 
                 const total = maxSnatch + maxCJ
 
-                const sinclair = calculateSinclair(total,bw)
+                const sinclair = calculateSinclair(total, bw, sex)
 
                 return <tr key={name}>
                   <td>{name}</td>
