@@ -23,21 +23,38 @@ export default function Home() {
   const [data, setData] = useState<Team[] | null>(null)
   const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams(data)
 
+  const fetchData = async () => {
+    const res = await fetch('/searchprod', {
+      method: "POST",
+      body: JSON.stringify({ url }),
+      headers: {
+        "Content-Type": "application/json"
+      },
+    })
+
+    console.log('kikoo')
+
+    const data = await res.json()
+    setData(data)
+  }
+
+  useEffect(() => {
+    if (data && url) {
+      const poll = setInterval(
+        fetchData, 5000
+      )
+
+      return clearInterval(poll)
+    }
+
+  }, [data, url])
+
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.stopPropagation()
     e.preventDefault()
 
     if (url) {
-      const res = await fetch('/searchprod', {
-        method: "POST",
-        body: JSON.stringify({ url }),
-        headers: {
-          "Content-Type": "application/json"
-        },
-      })
-  
-      const data = await res.json()
-      setData(data)
+      fetchData()
     }
   }
 

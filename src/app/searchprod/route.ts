@@ -1,11 +1,32 @@
 import { NextResponse } from "next/server";
-import puppeteer from "puppeteer";
+import puppeteer, { ElementHandle } from "puppeteer";
 
-const formatLifts = (lifts: string[]) => lifts.map((lift: string) => ({
-        weight: parseInt(lift),
-        status: parseInt(lift) > 0 ? 'good lift' : 'no lift'
+const getStatus = (status: string) => {
+    switch(status) {
+        case 'attempt_1':
+            return 'good lift'
+        case 'attempt_2':
+            return 'no lift'
+        case 'attempt_0':
+        default:
+            return 'to do'
+    }
+}
+
+const formatLifts = async (lifts: ElementHandle<HTMLTableCellElement>[]) => await Promise.all(lifts.map(async (lift: ElementHandle<HTMLTableCellElement>) => {
+        const liftDiv = await lift.$('div')
+        if (liftDiv) {
+            const liftStatus = await liftDiv.getProperty('className').then(cn => cn.jsonValue())
+            const liftNumber = await liftDiv.$eval('strong', node => node.innerText)
+        
+            if (liftStatus && liftNumber) {
+                return {
+                    weight: parseInt(liftNumber),
+                    status: getStatus(liftStatus)
+                }
+            }
+        }
     }))
-
 
 export async function POST(request: Request) {
     const { url } = await request.json()
@@ -37,16 +58,20 @@ export async function POST(request: Request) {
                     })
                 })
                 .catch(async (error) => {
-                    const player = await row.$$eval('td', nodes => nodes.map(node => node.innerText))
-
+                    const player = await row.$$('td')
+                    
                     if (player && player.length) {
+                        const name = await (await player[1].getProperty('innerText')).jsonValue()
+                        const bw = await (await player[5].getProperty('innerText')).jsonValue()
+                        const sex = await (await player[16].getProperty('innerText')).jsonValue()
                         const formatPlayer = {
-                            name: player[1],
-                            bw: parseFloat(player[5].replace(',', '.')),
-                            snatches: formatLifts(player.slice(6, 9)),
-                            cjs: formatLifts(player.slice(10, 13)),
-                            sex: player[16].includes('M') ? 'M' : 'F'
+                            name,
+                            bw: parseFloat(bw.replace(',', '.')),
+                            snatches: await formatLifts(player.slice(6, 9)),
+                            cjs: await formatLifts(player.slice(10, 13)),
+                            sex: sex.includes('M') ? 'M' : 'F'
                         }
+
                         const lastIndex = data.length - 1
                         data[lastIndex].players.push(formatPlayer)
                     }
