@@ -2,6 +2,10 @@ import { Player, Team } from "../data/types";
 import { calculateSinclair } from "./sinclair";
 
 export const calculateCJ = (IWFToBeat: number, team: Team, player: Player, projectedCJ: number): number => {
+    if (IWFToBeat === 0) {
+        return 0
+    }
+
     const teamTotal = team.team.total
     const { snatches, cjs, bw, sex } = player
 

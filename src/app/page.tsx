@@ -23,38 +23,34 @@ export default function Home() {
   const [data, setData] = useState<Team[] | null>(null)
   const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams(data)
 
-  const fetchData = async () => {
-    const res = await fetch('/searchprod', {
-      method: "POST",
-      body: JSON.stringify({ url }),
-      headers: {
-        "Content-Type": "application/json"
-      },
-    })
+  // useEffect(() => {
+  //   if (data && url) {
+  //     const poll = setInterval(
+  //       fetchData, 5000
+  //     )
 
-    console.log('kikoo')
+  //     return clearInterval(poll)
+  //   }
 
-    const data = await res.json()
-    setData(data)
-  }
-
-  useEffect(() => {
-    if (data && url) {
-      const poll = setInterval(
-        fetchData, 5000
-      )
-
-      return clearInterval(poll)
-    }
-
-  }, [data, url])
+  // }, [data, url])
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.stopPropagation()
     e.preventDefault()
 
     if (url) {
-      fetchData()
+      const res = await fetch('/searchprod', {
+        method: "POST",
+        body: JSON.stringify({ url }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+      })
+  
+      console.log('kikoo')
+  
+      const data = await res.json()
+      setData(data)
     }
   }
 
@@ -114,8 +110,8 @@ export default function Home() {
               </tr>
               {players.map(player => {
                 const { name, bw, snatches, cjs, sex } = player
-                const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift').map(({ weight }) => weight))
-                const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift').map(({ weight }) => weight))
+                const maxSnatch = Math.max(...snatches.filter(({ status }) => status === 'good lift').map(({ weight }) => weight), 0)
+                const maxCJ = Math.max(...cjs.filter(({ status }) => status === 'good lift').map(({ weight }) => weight), 0)
 
                 const total = maxSnatch + maxCJ
 

@@ -12,5 +12,6 @@ const coefficients = {
 }
 
 export const calculateSinclair = (total: number, bw: number, sex: Sex): number => {
-    return Math.floor(Math.pow(10, coefficients[sex].ratio*Math.pow(Math.log10(bw/coefficients[sex].maxBw), 2))*total*100) / 100
+    const result = Math.floor(Math.pow(10, coefficients[sex].ratio*Math.pow(Math.log10(bw/coefficients[sex].maxBw), 2))*total*100) / 100
+    return isNaN(result) ? 0 : result
 }
