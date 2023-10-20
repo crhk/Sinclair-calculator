@@ -39,7 +39,7 @@ export default function Home() {
     e.preventDefault()
 
     if (url) {
-      const res = await fetch('/searchprod', {
+      const res = await fetch('/api', {
         method: "POST",
         body: JSON.stringify({ url }),
         headers: {
