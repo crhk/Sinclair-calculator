@@ -46,9 +46,7 @@ export default function Home() {
           "Content-Type": "application/json"
         },
       })
-  
-      console.log('kikoo')
-  
+    
       const data = await res.json()
       setData(data)
     }
