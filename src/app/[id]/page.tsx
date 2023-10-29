@@ -5,6 +5,7 @@ import { useTeams } from "../hooks/useTeams";
 import { calculateCJ } from "../lib/calculateCJ";
 import { Team } from "../data/types";
 import { calculateSinclair } from "../lib/sinclair";
+import { sample1 } from "@/app/test/data/sample1";
 
 const getClassName = (status: string) => {
   switch (status) {
@@ -18,25 +19,25 @@ const getClassName = (status: string) => {
   }
 };
 
+const test = true;
+
 export default function Page({ params }: { params: { id: string } }) {
-  const [data, setData] = useState<Team[] | null>(null);
+  const [data, setData] = useState<Team[] | null>(test ? sample1 : null);
   const { actualBestIWFTeam, projectedBestIWFTeam } = useTeams(data);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api", {
-        method: "POST",
-        body: JSON.stringify({ url: params.id }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      setData(data);
-    };
-
-    fetchData();
+    // const fetchData = async () => {
+    //   const res = await fetch("/api", {
+    //     method: "POST",
+    //     body: JSON.stringify({ url: params.id }),
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+    //   const data = await res.json();
+    //   setData(data);
+    // };
+    // fetchData();
   }, [params.id]);
 
   if (!data) {
