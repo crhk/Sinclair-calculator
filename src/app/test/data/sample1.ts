@@ -1,6 +1,8 @@
-export const sample1 = [
+import { Team } from "../../data/types";
+
+export const sample1: Team[] = [
   {
-    team: { name: "CHM PLOUHINEC POINTE DU RAZ", total: "603,65" },
+    team: { name: "CHM PLOUHINEC POINTE DU RAZ", total: 603.65 },
     players: [
       {
         name: "QUERE Noémie",
@@ -65,7 +67,7 @@ export const sample1 = [
     ],
   },
   {
-    team: { name: "CROSSFIT BREST HALTEROPHILIE", total: "584,50" },
+    team: { name: "CROSSFIT BREST HALTEROPHILIE", total: 584.5 },
     players: [
       {
         name: "TRIMECH Nourhene",
@@ -130,7 +132,7 @@ export const sample1 = [
     ],
   },
   {
-    team: { name: "RBC WORKOUT", total: "573,59" },
+    team: { name: "RBC WORKOUT", total: 573.59 },
     players: [
       {
         name: "MARAMOTTI Anna",
@@ -195,7 +197,7 @@ export const sample1 = [
     ],
   },
   {
-    team: { name: "CA LORIENTAIS", total: "421,36" },
+    team: { name: "CA LORIENTAIS", total: 421.36 },
     players: [
       {
         name: "CAILLE Titia",
