@@ -134,10 +134,10 @@ export default function Page({ params }: { params: { id: string } }) {
                       <tr key={name}>
                         <td>{name}</td>
                         <td>{bw}</td>
-                        {snatches.map(({ weight, status }) => {
+                        {snatches.map(({ weight, status }, index) => {
                           return (
                             <td
-                              key={`snatch-${weight}-${status}`}
+                              key={`snatch-${weight}-${status}-${index}`}
                               className={getClassName(status)}
                             >
                               {weight}
@@ -145,10 +145,10 @@ export default function Page({ params }: { params: { id: string } }) {
                           );
                         })}
                         <td className="font-extrabold">{maxSnatch}</td>
-                        {cjs.map(({ weight, status }) => {
+                        {cjs.map(({ weight, status }, index) => {
                           return (
                             <td
-                              key={`cj-${weight}-${status}`}
+                              key={`cj-${weight}-${status}-${index}`}
                               className={getClassName(status)}
                             >
                               {weight}
