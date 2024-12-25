@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
-import puppeteer, { ElementHandle } from "puppeteer";
+import chromium from "@sparticuz/chromium-min";
+
+import puppeteer, { ElementHandle } from "puppeteer-core";
 
 const getStatus = (status: string) => {
   switch (status) {
@@ -37,8 +39,16 @@ const formatLifts = async (lifts: ElementHandle<HTMLTableCellElement>[]) =>
   );
 
 export async function POST(request: Request) {
+  const isLocal = !!process.env.CHROME_EXECUTABLE_PATH;
+
+  const browser = await puppeteer.launch({
+    args: isLocal ? puppeteer.defaultArgs() : chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: process.env.CHROME_EXECUTABLE_PATH,
+    headless: chromium.headless,
+  });
+
   const { url } = await request.json();
-  const browser = await puppeteer.launch({ headless: "new" });
 
   // Create a page
   const page = await browser.newPage();
